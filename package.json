@@ -1,0 +1,19 @@
+{
+  "name": "diff-editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "parse-diff": "^0.3.2",
+    "shelljs": "^0.7.3"
+  },
+  "devDependencies": {
+    "handlebars": "^4.0.5",
+    "hbsfy": "^2.7.0"
+  }
+}
