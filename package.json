@@ -9,8 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "parse-diff": "^0.3.2",
-    "shelljs": "^0.7.3"
+    "parse-diff": "^0.3.2"
   },
   "devDependencies": {
     "handlebars": "^4.0.5",
