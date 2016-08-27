@@ -12,8 +12,10 @@ module.exports = AbstractView.extend({
 ,	fileChange: function()
 	{
 		var self = this
+		// console.log('file size: '+this.$('[data-action="file"]').length)
 		this.readFileFrom(this.$('[data-action="file"]').get(0), function(content)
 		{
+			// console.log('fileChange', content)
 			self.application.setDiffContent(content)
 			Backbone.history.navigate('workspace', {trigger: true})
 		})

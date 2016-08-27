@@ -1325,6 +1325,7 @@ _.extend(Application.prototype, {
 ,	setDiffContent: function(content)
 	{
 		this.diff = diffUtils.parseDiff(content)
+		// console.log('setDiffContent', content, this.diff)
 	}
 ,	getDiff: function()
 	{
@@ -1338,6 +1339,7 @@ var Backbone = require('../lib/Backbone')
 var OpenFileView = require('../view/OpenFileView')
 var WorkspaceView = require('../view/editor/WorkspaceView')
 
+var workspaceFirstTime = true;
 module.exports = Backbone.Router.extend({
 
 	routes: {
@@ -1354,17 +1356,28 @@ module.exports = Backbone.Router.extend({
 ,	workspace: function() 
 	{
 		var self = this;
-		//Heads up! to be removed!  mock a diff file for fast development
-		require('../lib/jQuery')
-		.get('sample-diff.patch')
-		.done(function(diffText)
+		if(workspaceFirstTime)
 		{
-			self.application.setDiffContent(diffText)
-			// console.log('DONE', arguments)
-
-			var view = new WorkspaceView()
-			self.application.showView(view)
-		})	
+			workspaceFirstTime=false;
+			//Heads up! to be removed!  mock a diff file for fast development
+			require('../lib/jQuery')
+			.get('sample-diff.patch')
+			.done(function(diffText)
+			{
+				self.application.setDiffContent(diffText)
+				self._workspace();
+			})
+		}
+		else
+		{
+			self._workspace();
+		}
+		
+	}
+,	_workspace: function()
+	{
+		var view = new WorkspaceView()
+		this.application.showView(view)
 	}
 
 });
@@ -1412,7 +1425,7 @@ module.exports = HandlebarsCompiler.template({"1":function(container,depth0,help
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1)) != null ? stack1.additions : stack1), depth0))
     + "</li>\n	<li><b>deletions</b>: "
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1)) != null ? stack1.deletions : stack1), depth0))
-    + "</li>\n</ul>\n<pre>"
+    + "</li>\n</ul>\n<pre contenteditable=\"true\">"
     + alias2(((helper = (helper = helpers.str || (depth0 != null ? depth0.str : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"str","hash":{},"data":data}) : helper)))
     + "</pre>\n";
 },"3":function(container,depth0,helpers,partials,data) {
@@ -1614,8 +1627,10 @@ module.exports = AbstractView.extend({
 ,	fileChange: function()
 	{
 		var self = this
+		// console.log('file size: '+this.$('[data-action="file"]').length)
 		this.readFileFrom(this.$('[data-action="file"]').get(0), function(content)
 		{
+			// console.log('fileChange', content)
 			self.application.setDiffContent(content)
 			Backbone.history.navigate('workspace', {trigger: true})
 		})
@@ -1709,7 +1724,7 @@ module.exports = AbstractView.extend({
 		}
 
 		var data = [this.diff];
-
+		// console.log('afterRender', data)
 
 		this.$('[data-type="tree"]').jstree({
 			'core' : {

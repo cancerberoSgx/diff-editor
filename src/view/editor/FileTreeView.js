@@ -22,7 +22,7 @@ module.exports = AbstractView.extend({
 		}
 
 		var data = [this.diff];
-
+		// console.log('afterRender', data)
 
 		this.$('[data-type="tree"]').jstree({
 			'core' : {

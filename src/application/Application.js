@@ -30,6 +30,7 @@ _.extend(Application.prototype, {
 ,	setDiffContent: function(content)
 	{
 		this.diff = diffUtils.parseDiff(content)
+		// console.log('setDiffContent', content, this.diff)
 	}
 ,	getDiff: function()
 	{

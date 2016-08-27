@@ -2,6 +2,7 @@ var Backbone = require('../lib/Backbone')
 var OpenFileView = require('../view/OpenFileView')
 var WorkspaceView = require('../view/editor/WorkspaceView')
 
+var workspaceFirstTime = true;
 module.exports = Backbone.Router.extend({
 
 	routes: {
@@ -18,17 +19,28 @@ module.exports = Backbone.Router.extend({
 ,	workspace: function() 
 	{
 		var self = this;
-		//Heads up! to be removed!  mock a diff file for fast development
-		require('../lib/jQuery')
-		.get('sample-diff.patch')
-		.done(function(diffText)
+		if(workspaceFirstTime)
 		{
-			self.application.setDiffContent(diffText)
-			// console.log('DONE', arguments)
-
-			var view = new WorkspaceView()
-			self.application.showView(view)
-		})	
+			workspaceFirstTime=false;
+			//Heads up! to be removed!  mock a diff file for fast development
+			require('../lib/jQuery')
+			.get('sample-diff.patch')
+			.done(function(diffText)
+			{
+				self.application.setDiffContent(diffText)
+				self._workspace();
+			})
+		}
+		else
+		{
+			self._workspace();
+		}
+		
+	}
+,	_workspace: function()
+	{
+		var view = new WorkspaceView()
+		this.application.showView(view)
 	}
 
 });
