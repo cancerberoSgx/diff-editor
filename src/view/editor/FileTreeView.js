@@ -6,10 +6,18 @@ module.exports = AbstractView.extend({
 
 	template: require('../../template/editor/filetree.hbs')
 
+,	treeSelectionHandler: function(e, data)
+	{
+		var model = data.node;
+		this.workspace
+
+		console.log(data, e);
+			// console.log(data.selected);
+	}
+
 ,	afterRender: function()
 	{
 		this.diff = this.application.getDiff()
-		debugger;
 		if(!this.diff)
 		{
 			Backbone.history.navigate('openFile', {trigger: true})
@@ -22,22 +30,11 @@ module.exports = AbstractView.extend({
 		this.$('[data-type="tree"]').jstree({
 			'core' : {
 				'data' : data
-				// [
-				// 	{ "text" : "Root node", "children" : [
-				// 			{ "text" : "Child node 1" },
-				// 			{ "text" : "Child node 2" }
-				// 		]
-				// 	}
-				// ]
 			}
 		});
 
-
-		this.$('[data-type="tree"]').on("changed.jstree", function (e, data) 
-		 {
-			console.log("The selected nodes are:");
-			console.log(data.selected);
-		});
+		//backbone events won't work for this binding:
+		this.$('[data-type="tree"]').on("changed.jstree", _.bind(this.treeSelectionHandler, this))
 	}
 
 })

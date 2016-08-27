@@ -1371,7 +1371,7 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "workspace! <a href=\"#openFile\">open file</a>\n\n<div data-view=\"file-tree\"></div>\n\nend workspace";
+    return "workspace! <a href=\"#openFile\">open file</a>\n\n<div data-view=\"file-tree\"></div>\n\n<div data-view=\"file-editor\"></div>\n\nend workspace";
 },"useData":true});
 
 },{"hbsfy/runtime":20}],29:[function(require,module,exports){
@@ -1393,13 +1393,11 @@ module.exports = {
 		var tree = this.pathsToTree(filePaths)
 		this.visitTreeNodes(tree, function(n)
 		{
-			// console.log('visittreenodes', n)
 			n.data = _.find(files, function(f){return f.from===n.id})
+			// n.children = n.children && n.children.length ? n.children : undefined
+			n.text = n.name; //for jstree
 		})
 		return tree;
-		// console.log(tree)
-		// this.parseFilePath(files[0].from)
-		// _.each(parsed, (p)=>{diffUtils.parseFilePath(p.from)})
 	}
 
 
@@ -1419,7 +1417,8 @@ module.exports = {
 // 	}
 
 
-	// path strings to tree structure utility: pathToTree
+	// path strings to tree structure utility: pathsToTree. input is an array of string file paths. 
+	// Given paths will be 'normalized' to unix. The output is a tree structure
 
 ,	folderSep: '/'
 
@@ -1439,7 +1438,7 @@ module.exports = {
 					inner.push(arr[j])
 				}
 				var file = inner.join(self.folderSep)
-				tree[file] = tree[file] || {id: file, text: inner[inner.length-1], children: []}
+				tree[file] = tree[file] || {id: file, name: inner[inner.length-1], children: []}
 			}
 		})
 		//now we assign parentship in 'children' property. Also find the root node
@@ -1567,10 +1566,18 @@ module.exports = AbstractView.extend({
 
 	template: require('../../template/editor/filetree.hbs')
 
+,	treeSelectionHandler: function(e, data)
+	{
+		var model = data.node;
+		this.workspace
+
+		console.log(data, e);
+			// console.log(data.selected);
+	}
+
 ,	afterRender: function()
 	{
 		this.diff = this.application.getDiff()
-		debugger;
 		if(!this.diff)
 		{
 			Backbone.history.navigate('openFile', {trigger: true})
@@ -1583,22 +1590,11 @@ module.exports = AbstractView.extend({
 		this.$('[data-type="tree"]').jstree({
 			'core' : {
 				'data' : data
-				// [
-				// 	{ "text" : "Root node", "children" : [
-				// 			{ "text" : "Child node 1" },
-				// 			{ "text" : "Child node 2" }
-				// 		]
-				// 	}
-				// ]
 			}
 		});
 
-
-		this.$('[data-type="tree"]').on("changed.jstree", function (e, data) 
-		 {
-			console.log("The selected nodes are:");
-			console.log(data.selected);
-		});
+		//backbone events won't work for this binding:
+		this.$('[data-type="tree"]').on("changed.jstree", _.bind(this.treeSelectionHandler, this))
 	}
 
 })
@@ -1618,6 +1614,15 @@ module.exports = AbstractView.extend({
 			view.application = parentView.application
 			return view;
 		}
+
+	,	'file-editor': function(parentView)
+		{
+			var view = new FileTreeView()
+			view.application = parentView.application
+			return view;
+		}
+
+		
 	}
 })
 },{"../../lib/underscore":26,"../../template/editor/workspace.hbs":28,"../../view/AbstractView":31,"./FileTreeView":33}],35:[function(require,module,exports){

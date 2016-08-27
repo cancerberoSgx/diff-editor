@@ -9,13 +9,11 @@ module.exports = {
 		var tree = this.pathsToTree(filePaths)
 		this.visitTreeNodes(tree, function(n)
 		{
-			// console.log('visittreenodes', n)
 			n.data = _.find(files, function(f){return f.from===n.id})
+			// n.children = n.children && n.children.length ? n.children : undefined
+			n.text = n.name; //for jstree
 		})
 		return tree;
-		// console.log(tree)
-		// this.parseFilePath(files[0].from)
-		// _.each(parsed, (p)=>{diffUtils.parseFilePath(p.from)})
 	}
 
 
@@ -35,7 +33,8 @@ module.exports = {
 // 	}
 
 
-	// path strings to tree structure utility: pathToTree
+	// path strings to tree structure utility: pathsToTree. input is an array of string file paths. 
+	// Given paths will be 'normalized' to unix. The output is a tree structure
 
 ,	folderSep: '/'
 
@@ -55,7 +54,7 @@ module.exports = {
 					inner.push(arr[j])
 				}
 				var file = inner.join(self.folderSep)
-				tree[file] = tree[file] || {id: file, text: inner[inner.length-1], children: []}
+				tree[file] = tree[file] || {id: file, name: inner[inner.length-1], children: []}
 			}
 		})
 		//now we assign parentship in 'children' property. Also find the root node
