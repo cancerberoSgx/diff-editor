@@ -1322,6 +1322,10 @@ _.extend(Application.prototype, {
 	{
 		this.diff = diffUtils.parseDiff(content)
 	}
+,	getDiff: function()
+	{
+		return this.diff
+	}
 })
 
 module.exports = Application
@@ -1392,8 +1396,8 @@ module.exports = {
 			// console.log('visittreenodes', n)
 			n.data = _.find(files, function(f){return f.from===n.id})
 		})
-		
-		console.log(tree)
+		return tree;
+		// console.log(tree)
 		// this.parseFilePath(files[0].from)
 		// _.each(parsed, (p)=>{diffUtils.parseFilePath(p.from)})
 	}
@@ -1435,7 +1439,7 @@ module.exports = {
 					inner.push(arr[j])
 				}
 				var file = inner.join(self.folderSep)
-				tree[file] = tree[file] || {id: file, children: []}
+				tree[file] = tree[file] || {id: file, text: inner[inner.length-1], children: []}
 			}
 		})
 		//now we assign parentship in 'children' property. Also find the root node
@@ -1497,11 +1501,11 @@ module.exports = Backbone.View.extend({
 			}
 		})
 	}
-,	renderIn: function($el)
-	{
-		this.$el = $el
-		this.render()
-	}
+// ,	renderIn: function($el)
+// 	{
+// 		this.$el = $el
+// 		this.render()
+// 	}
 
 ,	template: function()
 	{
@@ -1565,15 +1569,27 @@ module.exports = AbstractView.extend({
 
 ,	afterRender: function()
 	{
+		this.diff = this.application.getDiff()
+		debugger;
+		if(!this.diff)
+		{
+			Backbone.history.navigate('openFile', {trigger: true})
+			alert('You have to choose a diff file first.')
+		}
+
+		var data = [this.diff];
+
+
 		this.$('[data-type="tree"]').jstree({
 			'core' : {
-				'data' : [
-					{ "text" : "Root node", "children" : [
-							{ "text" : "Child node 1" },
-							{ "text" : "Child node 2" }
-						]
-					}
-				]
+				'data' : data
+				// [
+				// 	{ "text" : "Root node", "children" : [
+				// 			{ "text" : "Child node 1" },
+				// 			{ "text" : "Child node 2" }
+				// 		]
+				// 	}
+				// ]
 			}
 		});
 

@@ -27,6 +27,10 @@ _.extend(Application.prototype, {
 	{
 		this.diff = diffUtils.parseDiff(content)
 	}
+,	getDiff: function()
+	{
+		return this.diff
+	}
 })
 
 module.exports = Application

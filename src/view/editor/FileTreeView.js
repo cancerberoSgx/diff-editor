@@ -9,10 +9,19 @@ module.exports = AbstractView.extend({
 ,	afterRender: function()
 	{
 		this.diff = this.application.getDiff()
+		debugger;
+		if(!this.diff)
+		{
+			Backbone.history.navigate('openFile', {trigger: true})
+			alert('You have to choose a diff file first.')
+		}
+
+		var data = [this.diff];
+
 
 		this.$('[data-type="tree"]').jstree({
 			'core' : {
-				'data' : [this.diff]
+				'data' : data
 				// [
 				// 	{ "text" : "Root node", "children" : [
 				// 			{ "text" : "Child node 1" },
