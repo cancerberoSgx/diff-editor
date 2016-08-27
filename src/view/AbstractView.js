@@ -29,11 +29,11 @@ module.exports = Backbone.View.extend({
 			}
 		})
 	}
-,	renderIn: function($el)
-	{
-		this.$el = $el
-		this.render()
-	}
+// ,	renderIn: function($el)
+// 	{
+// 		this.$el = $el
+// 		this.render()
+// 	}
 
 ,	template: function()
 	{

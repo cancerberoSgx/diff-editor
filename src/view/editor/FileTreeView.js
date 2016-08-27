@@ -8,15 +8,18 @@ module.exports = AbstractView.extend({
 
 ,	afterRender: function()
 	{
+		this.diff = this.application.getDiff()
+
 		this.$('[data-type="tree"]').jstree({
 			'core' : {
-				'data' : [
-					{ "text" : "Root node", "children" : [
-							{ "text" : "Child node 1" },
-							{ "text" : "Child node 2" }
-						]
-					}
-				]
+				'data' : [this.diff]
+				// [
+				// 	{ "text" : "Root node", "children" : [
+				// 			{ "text" : "Child node 1" },
+				// 			{ "text" : "Child node 2" }
+				// 		]
+				// 	}
+				// ]
 			}
 		});
 

@@ -55,7 +55,7 @@ module.exports = {
 					inner.push(arr[j])
 				}
 				var file = inner.join(self.folderSep)
-				tree[file] = tree[file] || {id: file, children: []}
+				tree[file] = tree[file] || {id: file, text: file, children: []}
 			}
 		})
 		//now we assign parentship in 'children' property. Also find the root node
