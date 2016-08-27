@@ -1,2 +1,18 @@
 file editor !
+{{#if model.data}}
+<ul>
+	<li><b>from</b>: {{model.data.from}}</li>
+	<li><b>to</b>: {{model.data.to}}</li>
+	<li><b>additions</b>: {{model.data.additions}}</li>
+	<li><b>deletions</b>: {{model.data.deletions}}</li>
+</ul>
 <pre>{{str}}</pre>
+{{/if}}
+{{#else}}
+
+Please select a file in the tree
+{{/else}}
+
+{{#unless model.data}}
+Please select a file in the tree
+{{/unless}}

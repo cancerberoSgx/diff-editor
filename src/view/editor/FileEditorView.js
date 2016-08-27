@@ -40,7 +40,7 @@ module.exports = AbstractView.extend({
 		})
 		
 		var str = buf.join('\n')
-		console.log('contettt',str)
+		console.log('contettt',this.model)
 		return {
 			model:this.model
 		,	str: str

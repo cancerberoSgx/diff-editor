@@ -1401,12 +1401,33 @@ module.exports = _
 },{}],28:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
-module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    var helper;
+module.exports = HandlebarsCompiler.template({"1":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, alias1=container.lambda, alias2=container.escapeExpression;
 
-  return "file editor !\n<pre>"
-    + container.escapeExpression(((helper = (helper = helpers.str || (depth0 != null ? depth0.str : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"str","hash":{},"data":data}) : helper)))
-    + "</pre>";
+  return "<ul>\n	<li><b>from</b>: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1)) != null ? stack1.from : stack1), depth0))
+    + "</li>\n	<li><b>to</b>: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1)) != null ? stack1.to : stack1), depth0))
+    + "</li>\n	<li><b>additions</b>: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1)) != null ? stack1.additions : stack1), depth0))
+    + "</li>\n	<li><b>deletions</b>: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1)) != null ? stack1.deletions : stack1), depth0))
+    + "</li>\n</ul>\n<pre>"
+    + alias2(((helper = (helper = helpers.str || (depth0 != null ? depth0.str : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"str","hash":{},"data":data}) : helper)))
+    + "</pre>\n";
+},"3":function(container,depth0,helpers,partials,data) {
+    return "\nPlease select a file in the tree\n";
+},"5":function(container,depth0,helpers,partials,data) {
+    return "Please select a file in the tree\n";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, buffer = 
+  "file editor !\n"
+    + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+  stack1 = ((helper = (helper = helpers["else"] || (depth0 != null ? depth0["else"] : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"else","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data}),(typeof helper === "function" ? helper.call(alias1,options) : helper));
+  if (!helpers["else"]) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n"
+    + ((stack1 = helpers.unless.call(alias1,((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1),{"name":"unless","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"useData":true});
 
 },{"hbsfy/runtime":20}],29:[function(require,module,exports){
@@ -1655,7 +1676,7 @@ module.exports = AbstractView.extend({
 		})
 		
 		var str = buf.join('\n')
-		console.log('contettt',str)
+		console.log('contettt',this.model)
 		return {
 			model:this.model
 		,	str: str
