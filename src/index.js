@@ -33,26 +33,3 @@ application.start()
 // myView.render()
 
 
-
-
-// $(document.body).append('<div id="container">hello</div>')
-
-
-// $('#container').jstree({
-// 	'core' : {
-// 		'data' : [
-// 			{ "text" : "Root node", "children" : [
-// 					{ "text" : "Child node 1" },
-// 					{ "text" : "Child node 2" }
-// 				]
-// 			}
-// 		]
-// 	}
-// });
-
-
-//  $('#container').on("changed.jstree", function (e, data) 
-//  {
-// 	console.log("The selected nodes are:");
-// 	console.log(data.selected);
-// });

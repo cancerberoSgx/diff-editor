@@ -1296,6 +1296,7 @@ escapeRegExp = function(s) {
 var _ = require('../lib/underscore')
 var Backbone = require('../lib/Backbone')
 var Router = require('../application/EditorRouter')
+var diffUtils = require('../utils/DiffUtils')
 
 var Application = function(){}
 
@@ -1303,75 +1304,80 @@ _.extend(Application.prototype, {
 
 	start: function()
 	{
-		var router = new Router();
-		router.application = this;
+		this.router = new Router();
+		this.router.application = this;
 		Backbone.history.start();
 	}
 
 ,	showView: function(view)
 	{
+		view.application=this
 		if(this.currentView)
 			this.currentView.destroy()
 		this.currentView = view;
 		view.render()
 		view.$el.appendTo(document.body)
 	}
+,	setDiffContent: function(content)
+	{
+		this.diff = diffUtils.parseDiff(content)
+	}
 })
 
 module.exports = Application
-},{"../application/EditorRouter":23,"../lib/Backbone":24,"../lib/underscore":25}],23:[function(require,module,exports){
+},{"../application/EditorRouter":23,"../lib/Backbone":24,"../lib/underscore":26,"../utils/DiffUtils":30}],23:[function(require,module,exports){
 var Backbone = require('../lib/Backbone')
-
 var OpenFileView = require('../view/OpenFileView')
-
 var WorkspaceView = require('../view/editor/WorkspaceView')
+
 module.exports = Backbone.Router.extend({
 
 	routes: {
 		"openFile": "openFile",
 		"workspace": "workspace"
-	},
+	}
 
-	openFile: function() 
+,	openFile: function() 
 	{
 		var view = new OpenFileView()
 		this.application.showView(view)
-	},
+	}
 
-
-	workspace: function() 
+,	workspace: function() 
 	{
 		var view = new WorkspaceView()
 		this.application.showView(view)
 	}
 
 });
-},{"../lib/Backbone":24,"../view/OpenFileView":31,"../view/editor/WorkspaceView":33}],24:[function(require,module,exports){
+},{"../lib/Backbone":24,"../view/OpenFileView":32,"../view/editor/WorkspaceView":34}],24:[function(require,module,exports){
 module.exports = Backbone
 },{}],25:[function(require,module,exports){
-module.exports = _
+module.exports = jQuery
 },{}],26:[function(require,module,exports){
+module.exports = _
+},{}],27:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "file tree!";
-},"useData":true});
-
-},{"hbsfy/runtime":20}],27:[function(require,module,exports){
-// hbsfy compiled Handlebars template
-var HandlebarsCompiler = require('hbsfy/runtime');
-module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "workspace!\n\n<div data-view=\"file-tree\"></div>\n\nend workspace";
+    return "file tree!\n\n<div data-type=\"tree\">heloooooo</div>\n\n<p>file tree end</p>";
 },"useData":true});
 
 },{"hbsfy/runtime":20}],28:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "Open file : \n<br/>\n<input data-action=\"file\" type=\"file\"></input>";
+    return "workspace! <a href=\"#openFile\">open file</a>\n\n<div data-view=\"file-tree\"></div>\n\nend workspace";
 },"useData":true});
 
 },{"hbsfy/runtime":20}],29:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var HandlebarsCompiler = require('hbsfy/runtime');
+module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "Open file : \n<br/>\n<input data-action=\"file\" type=\"file\"></input>";
+},"useData":true});
+
+},{"hbsfy/runtime":20}],30:[function(require,module,exports){
 var parse = require('parse-diff');
 // var path = require('path')
 
@@ -1381,12 +1387,32 @@ module.exports = {
 		var files = parse(diffContent);
 		var filePaths = _.map(files, function(file){return file.from})
 		var tree = this.pathsToTree(filePaths)
+		this.visitTreeNodes(tree, function(n)
+		{
+			// console.log('visittreenodes', n)
+			n.data = _.find(files, function(f){return f.from===n.id})
+		})
 		
-		// console.log(filePaths)
+		console.log(tree)
 		// this.parseFilePath(files[0].from)
 		// _.each(parsed, (p)=>{diffUtils.parseFilePath(p.from)})
 	}
 
+
+
+,	visitTreeNodes: function(node, fn)
+	{
+		if(!node)
+			return
+		var self = this;
+		fn(node)
+		_.each(node.children, function(c){self.visitTreeNodes(c, fn)})
+	}
+// ,	parseFilePath: function(filePath)
+// 	{
+// 		var fileName = path.basename(filePath)
+// 		,	folder = filePath.substring(0, filePath.indexOf(fileName))
+// 	}
 
 
 	// path strings to tree structure utility: pathToTree
@@ -1399,6 +1425,7 @@ module.exports = {
 		var self = this;
 		_.each(paths, function(path)
 		{
+			path = path.replace(/\\/g, '/') // convert windows to unix folder separator first
 			var arr = path.split(self.folderSep)
 			for (var i = 0; i < arr.length; i++) 
 			{
@@ -1428,24 +1455,17 @@ module.exports = {
 		})
 		//now remove all primary nodes but the root
 		var tree = _.filter(tree, function(val,name){return name==root})[0]
-		console.log(tree)
+		return tree;
 	}
 ,	getParentFolder: function(p)
 	{
 		var a = p.split(this.folderSep)
 		a.splice(a.length-1, 1)
-		// console.log(a)
 		var result = a.join(this.folderSep)
 		return result!==p ? result : null;
 	}
-,	parseFilePath: function(filePath)
-	{
-		var fileName = path.basename(filePath)
-		,	folder = filePath.substring(0, filePath.indexOf(fileName))
-		console.log('seba', fileName, folder )
-	}
 }
-},{"parse-diff":21}],30:[function(require,module,exports){
+},{"parse-diff":21}],31:[function(require,module,exports){
 var _ = require('../lib/underscore');
 var Backbone = require('../lib/Backbone')
 
@@ -1457,6 +1477,11 @@ module.exports = Backbone.View.extend({
 		this.$el.html(html)
 
 		this.renderChilds()
+		
+		if(this.afterRender)
+			this.afterRender()
+
+		
 	}
 ,	renderChilds: function()
 	{
@@ -1487,12 +1512,17 @@ module.exports = Backbone.View.extend({
 	{
 		return {}; 
 	}
+
+,	destroy: function()
+	{
+		this.undelegateEvents()
+		this.$el.remove()
+	}
 })
 
-},{"../lib/Backbone":24,"../lib/underscore":25}],31:[function(require,module,exports){
+},{"../lib/Backbone":24,"../lib/underscore":26}],32:[function(require,module,exports){
 var AbstractView = require('../view/AbstractView')
 var _ = require('../lib/underscore')
-var diffUtils = require('../utils/DiffUtils')
 
 module.exports = AbstractView.extend({
 
@@ -1504,9 +1534,11 @@ module.exports = AbstractView.extend({
 
 ,	fileChange: function()
 	{
+		var self = this
 		this.readFileFrom(this.$('[data-action="file"]').get(0), function(content)
 		{
-			var parsed = diffUtils.parseDiff(content)
+			self.application.setDiffContent(content)
+			Backbone.history.navigate('workspace', {trigger: true})
 		})
 	}
 
@@ -1522,16 +1554,39 @@ module.exports = AbstractView.extend({
 	}
 
 })
-},{"../lib/underscore":25,"../template/openFile.hbs":28,"../utils/DiffUtils":29,"../view/AbstractView":30}],32:[function(require,module,exports){
+},{"../lib/underscore":26,"../template/openFile.hbs":29,"../view/AbstractView":31}],33:[function(require,module,exports){
 var AbstractView = require('../../view/AbstractView')
 var _ = require('../../lib/underscore')
+var $ = require('../../lib/jQuery')
 
 module.exports = AbstractView.extend({
 
 	template: require('../../template/editor/filetree.hbs')
 
+,	afterRender: function()
+	{
+		this.$('[data-type="tree"]').jstree({
+			'core' : {
+				'data' : [
+					{ "text" : "Root node", "children" : [
+							{ "text" : "Child node 1" },
+							{ "text" : "Child node 2" }
+						]
+					}
+				]
+			}
+		});
+
+
+		this.$('[data-type="tree"]').on("changed.jstree", function (e, data) 
+		 {
+			console.log("The selected nodes are:");
+			console.log(data.selected);
+		});
+	}
+
 })
-},{"../../lib/underscore":25,"../../template/editor/filetree.hbs":26,"../../view/AbstractView":30}],33:[function(require,module,exports){
+},{"../../lib/jQuery":25,"../../lib/underscore":26,"../../template/editor/filetree.hbs":27,"../../view/AbstractView":31}],34:[function(require,module,exports){
 var AbstractView = require('../../view/AbstractView')
 var FileTreeView = require('./FileTreeView')
 var _ = require('../../lib/underscore')
@@ -1539,14 +1594,17 @@ var _ = require('../../lib/underscore')
 module.exports = AbstractView.extend({
 
 	template: require('../../template/editor/workspace.hbs')
+
 ,	childViews: {
 		'file-tree': function(parentView)
 		{
-			return new FileTreeView()
+			var view = new FileTreeView()
+			view.application = parentView.application
+			return view;
 		}
 	}
 })
-},{"../../lib/underscore":25,"../../template/editor/workspace.hbs":27,"../../view/AbstractView":30,"./FileTreeView":32}],34:[function(require,module,exports){
+},{"../../lib/underscore":26,"../../template/editor/workspace.hbs":28,"../../view/AbstractView":31,"./FileTreeView":33}],35:[function(require,module,exports){
 var Application = require('./application/Application')
 var application = new Application()
 application.start()
@@ -1583,26 +1641,4 @@ application.start()
 
 
 
-
-// $(document.body).append('<div id="container">hello</div>')
-
-
-// $('#container').jstree({
-// 	'core' : {
-// 		'data' : [
-// 			{ "text" : "Root node", "children" : [
-// 					{ "text" : "Child node 1" },
-// 					{ "text" : "Child node 2" }
-// 				]
-// 			}
-// 		]
-// 	}
-// });
-
-
-//  $('#container').on("changed.jstree", function (e, data) 
-//  {
-// 	console.log("The selected nodes are:");
-// 	console.log(data.selected);
-// });
-},{"./application/Application":22}]},{},[34]);
+},{"./application/Application":22}]},{},[35]);

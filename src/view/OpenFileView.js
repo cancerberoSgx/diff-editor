@@ -1,6 +1,5 @@
 var AbstractView = require('../view/AbstractView')
 var _ = require('../lib/underscore')
-var diffUtils = require('../utils/DiffUtils')
 
 module.exports = AbstractView.extend({
 
@@ -12,9 +11,11 @@ module.exports = AbstractView.extend({
 
 ,	fileChange: function()
 	{
+		var self = this
 		this.readFileFrom(this.$('[data-action="file"]').get(0), function(content)
 		{
-			var parsed = diffUtils.parseDiff(content)
+			self.application.setDiffContent(content)
+			Backbone.history.navigate('workspace', {trigger: true})
 		})
 	}
 

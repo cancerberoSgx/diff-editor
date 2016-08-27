@@ -9,6 +9,11 @@ module.exports = Backbone.View.extend({
 		this.$el.html(html)
 
 		this.renderChilds()
+		
+		if(this.afterRender)
+			this.afterRender()
+
+		
 	}
 ,	renderChilds: function()
 	{
@@ -38,5 +43,11 @@ module.exports = Backbone.View.extend({
 ,	getContext: function()
 	{
 		return {}; 
+	}
+
+,	destroy: function()
+	{
+		this.undelegateEvents()
+		this.$el.remove()
 	}
 })
