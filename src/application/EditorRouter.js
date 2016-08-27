@@ -17,8 +17,18 @@ module.exports = Backbone.Router.extend({
 
 ,	workspace: function() 
 	{
-		var view = new WorkspaceView()
-		this.application.showView(view)
+		var self = this;
+		//Heads up! to be removed!  mock a diff file for fast development
+		require('../lib/jQuery')
+		.get('sample-diff.patch')
+		.done(function(diffText)
+		{
+			self.application.setDiffContent(diffText)
+			// console.log('DONE', arguments)
+
+			var view = new WorkspaceView()
+			self.application.showView(view)
+		})	
 	}
 
 });

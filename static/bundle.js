@@ -1296,6 +1296,7 @@ escapeRegExp = function(s) {
 var _ = require('../lib/underscore')
 var Backbone = require('../lib/Backbone')
 var Router = require('../application/EditorRouter')
+var Workspace = require('./Workspace')
 var diffUtils = require('../utils/DiffUtils')
 
 var Application = function(){}
@@ -1304,6 +1305,9 @@ _.extend(Application.prototype, {
 
 	start: function()
 	{
+		this.workspace = new Workspace()
+		
+		//start routers & history
 		this.router = new Router();
 		this.router.application = this;
 		Backbone.history.start();
@@ -1329,7 +1333,7 @@ _.extend(Application.prototype, {
 })
 
 module.exports = Application
-},{"../application/EditorRouter":23,"../lib/Backbone":24,"../lib/underscore":26,"../utils/DiffUtils":30}],23:[function(require,module,exports){
+},{"../application/EditorRouter":23,"../lib/Backbone":25,"../lib/underscore":27,"../utils/DiffUtils":32,"./Workspace":24}],23:[function(require,module,exports){
 var Backbone = require('../lib/Backbone')
 var OpenFileView = require('../view/OpenFileView')
 var WorkspaceView = require('../view/editor/WorkspaceView')
@@ -1349,39 +1353,70 @@ module.exports = Backbone.Router.extend({
 
 ,	workspace: function() 
 	{
-		var view = new WorkspaceView()
-		this.application.showView(view)
+		var self = this;
+		//Heads up! to be removed!  mock a diff file for fast development
+		require('../lib/jQuery')
+		.get('sample-diff.patch')
+		.done(function(diffText)
+		{
+			self.application.setDiffContent(diffText)
+			// console.log('DONE', arguments)
+
+			var view = new WorkspaceView()
+			self.application.showView(view)
+		})	
 	}
 
 });
-},{"../lib/Backbone":24,"../view/OpenFileView":32,"../view/editor/WorkspaceView":34}],24:[function(require,module,exports){
-module.exports = Backbone
-},{}],25:[function(require,module,exports){
-module.exports = jQuery
-},{}],26:[function(require,module,exports){
-module.exports = _
-},{}],27:[function(require,module,exports){
-// hbsfy compiled Handlebars template
-var HandlebarsCompiler = require('hbsfy/runtime');
-module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "file tree!\n\n<div data-type=\"tree\">heloooooo</div>\n\n<p>file tree end</p>";
-},"useData":true});
+},{"../lib/Backbone":25,"../lib/jQuery":26,"../view/OpenFileView":34,"../view/editor/WorkspaceView":37}],24:[function(require,module,exports){
+var Workspace = function(){}
+var _ = require('../lib/underscore')
 
-},{"hbsfy/runtime":20}],28:[function(require,module,exports){
+// @class Workspace is a controller that handles the cooperation beween the uwer, the tree view and the editor so the application doesn't know anything about it,
+_.extend(Workspace.prototype, {
+	setSelectedFile: function(model)
+	{
+		console.log('www', model)
+	}
+})
+// Workspace.instance = new Workspace()
+
+module.exports = Workspace;
+},{"../lib/underscore":27}],25:[function(require,module,exports){
+module.exports = Backbone
+},{}],26:[function(require,module,exports){
+module.exports = jQuery
+},{}],27:[function(require,module,exports){
+module.exports = _
+},{}],28:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "workspace! <a href=\"#openFile\">open file</a>\n\n<div data-view=\"file-tree\"></div>\n\n<div data-view=\"file-editor\"></div>\n\nend workspace";
+    return "file editor !";
 },"useData":true});
 
 },{"hbsfy/runtime":20}],29:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "Open file : \n<br/>\n<input data-action=\"file\" type=\"file\"></input>";
+    return "file tree!\n\n<div data-type=\"tree\">heloooooo</div>\n\n<p>file tree end</p>";
 },"useData":true});
 
 },{"hbsfy/runtime":20}],30:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var HandlebarsCompiler = require('hbsfy/runtime');
+module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "workspace! <a href=\"#openFile\">open file</a>\n\n<div class=\"container-fluid\">\n\n<div class=\"row\">\n  <div class=\"col-md-4\">\n	<div data-view=\"file-tree\"></div>\n  </div>\n  <div class=\"col-md-8\">\n	<div data-view=\"file-editor\"></div>\n  </div>\n</div>\n\n</div>\n\n\n\nend workspace";
+},"useData":true});
+
+},{"hbsfy/runtime":20}],31:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var HandlebarsCompiler = require('hbsfy/runtime');
+module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "Open file : \n<br/>\n<input data-action=\"file\" type=\"file\"></input>";
+},"useData":true});
+
+},{"hbsfy/runtime":20}],32:[function(require,module,exports){
 var parse = require('parse-diff');
 // var path = require('path')
 
@@ -1395,7 +1430,11 @@ module.exports = {
 		{
 			n.data = _.find(files, function(f){return f.from===n.id})
 			// n.children = n.children && n.children.length ? n.children : undefined
-			n.text = n.name; //for jstree
+
+			//for jstree
+			n.text = n.name; 
+			n.state = {opened: true}
+			// n.icon = 'file'
 		})
 		return tree;
 	}
@@ -1410,11 +1449,8 @@ module.exports = {
 		fn(node)
 		_.each(node.children, function(c){self.visitTreeNodes(c, fn)})
 	}
-// ,	parseFilePath: function(filePath)
-// 	{
-// 		var fileName = path.basename(filePath)
-// 		,	folder = filePath.substring(0, filePath.indexOf(fileName))
-// 	}
+
+	
 
 
 	// path strings to tree structure utility: pathsToTree. input is an array of string file paths. 
@@ -1468,7 +1504,7 @@ module.exports = {
 		return result!==p ? result : null;
 	}
 }
-},{"parse-diff":21}],31:[function(require,module,exports){
+},{"parse-diff":21}],33:[function(require,module,exports){
 var _ = require('../lib/underscore');
 var Backbone = require('../lib/Backbone')
 
@@ -1495,6 +1531,11 @@ module.exports = Backbone.View.extend({
 			if(self.$(selector).length)
 			{
 				var childView = childConstructor(self)
+				//force to have parent application if none:
+				if(!childView.application && self.application)
+				{
+					childView.application = self.application;
+				}
 				childView.render()
 				self.$(selector).append(childView.$el)
 			}
@@ -1523,7 +1564,7 @@ module.exports = Backbone.View.extend({
 	}
 })
 
-},{"../lib/Backbone":24,"../lib/underscore":26}],32:[function(require,module,exports){
+},{"../lib/Backbone":25,"../lib/underscore":27}],34:[function(require,module,exports){
 var AbstractView = require('../view/AbstractView')
 var _ = require('../lib/underscore')
 
@@ -1557,10 +1598,29 @@ module.exports = AbstractView.extend({
 	}
 
 })
-},{"../lib/underscore":26,"../template/openFile.hbs":29,"../view/AbstractView":31}],33:[function(require,module,exports){
+},{"../lib/underscore":27,"../template/openFile.hbs":31,"../view/AbstractView":33}],35:[function(require,module,exports){
 var AbstractView = require('../../view/AbstractView')
 var _ = require('../../lib/underscore')
 var $ = require('../../lib/jQuery')
+
+module.exports = AbstractView.extend({
+
+	template: require('../../template/editor/fileeditor.hbs')
+
+,	afterRender: function()
+	{
+	}
+
+,	getContext: function()
+	{
+		// return this.application.workspace	
+	}
+
+})
+},{"../../lib/jQuery":26,"../../lib/underscore":27,"../../template/editor/fileeditor.hbs":28,"../../view/AbstractView":33}],36:[function(require,module,exports){
+var AbstractView = require('../../view/AbstractView')
+var _ = require('../../lib/underscore')
+// var $ = require('../../lib/jQuery')
 
 module.exports = AbstractView.extend({
 
@@ -1568,11 +1628,8 @@ module.exports = AbstractView.extend({
 
 ,	treeSelectionHandler: function(e, data)
 	{
-		var model = data.node;
-		this.workspace
-
-		console.log(data, e);
-			// console.log(data.selected);
+		// var model = data.node;
+		this.application.workspace.setSelectedFile(data.node)
 	}
 
 ,	afterRender: function()
@@ -1598,9 +1655,10 @@ module.exports = AbstractView.extend({
 	}
 
 })
-},{"../../lib/jQuery":25,"../../lib/underscore":26,"../../template/editor/filetree.hbs":27,"../../view/AbstractView":31}],34:[function(require,module,exports){
+},{"../../lib/underscore":27,"../../template/editor/filetree.hbs":29,"../../view/AbstractView":33}],37:[function(require,module,exports){
 var AbstractView = require('../../view/AbstractView')
 var FileTreeView = require('./FileTreeView')
+var FileEditorView = require('./FileEditorView')
 var _ = require('../../lib/underscore')
 
 module.exports = AbstractView.extend({
@@ -1611,21 +1669,21 @@ module.exports = AbstractView.extend({
 		'file-tree': function(parentView)
 		{
 			var view = new FileTreeView()
-			view.application = parentView.application
+			// view.application = parentView.application
 			return view;
 		}
 
 	,	'file-editor': function(parentView)
 		{
-			var view = new FileTreeView()
-			view.application = parentView.application
+			var view = new FileEditorView()
+			// view.application = parentView.application
 			return view;
 		}
 
 		
 	}
 })
-},{"../../lib/underscore":26,"../../template/editor/workspace.hbs":28,"../../view/AbstractView":31,"./FileTreeView":33}],35:[function(require,module,exports){
+},{"../../lib/underscore":27,"../../template/editor/workspace.hbs":30,"../../view/AbstractView":33,"./FileEditorView":35,"./FileTreeView":36}],38:[function(require,module,exports){
 var Application = require('./application/Application')
 var application = new Application()
 application.start()
@@ -1662,4 +1720,4 @@ application.start()
 
 
 
-},{"./application/Application":22}]},{},[35]);
+},{"./application/Application":22}]},{},[38]);

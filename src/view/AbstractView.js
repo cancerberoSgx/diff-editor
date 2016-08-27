@@ -24,6 +24,11 @@ module.exports = Backbone.View.extend({
 			if(self.$(selector).length)
 			{
 				var childView = childConstructor(self)
+				//force to have parent application if none:
+				if(!childView.application && self.application)
+				{
+					childView.application = self.application;
+				}
 				childView.render()
 				self.$(selector).append(childView.$el)
 			}

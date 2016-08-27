@@ -1,6 +1,6 @@
 var AbstractView = require('../../view/AbstractView')
 var _ = require('../../lib/underscore')
-var $ = require('../../lib/jQuery')
+// var $ = require('../../lib/jQuery')
 
 module.exports = AbstractView.extend({
 
@@ -8,11 +8,8 @@ module.exports = AbstractView.extend({
 
 ,	treeSelectionHandler: function(e, data)
 	{
-		var model = data.node;
-		this.workspace
-
-		console.log(data, e);
-			// console.log(data.selected);
+		// var model = data.node;
+		this.application.workspace.setSelectedFile(data.node)
 	}
 
 ,	afterRender: function()

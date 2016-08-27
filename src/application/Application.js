@@ -1,6 +1,7 @@
 var _ = require('../lib/underscore')
 var Backbone = require('../lib/Backbone')
 var Router = require('../application/EditorRouter')
+var Workspace = require('./Workspace')
 var diffUtils = require('../utils/DiffUtils')
 
 var Application = function(){}
@@ -9,6 +10,9 @@ _.extend(Application.prototype, {
 
 	start: function()
 	{
+		this.workspace = new Workspace()
+		
+		//start routers & history
 		this.router = new Router();
 		this.router.application = this;
 		Backbone.history.start();

@@ -14,7 +14,8 @@ module.exports = {
 
 			//for jstree
 			n.text = n.name; 
-			n.state.opened = true
+			n.state = {opened: true}
+			// n.icon = 'file'
 		})
 		return tree;
 	}
@@ -29,11 +30,8 @@ module.exports = {
 		fn(node)
 		_.each(node.children, function(c){self.visitTreeNodes(c, fn)})
 	}
-// ,	parseFilePath: function(filePath)
-// 	{
-// 		var fileName = path.basename(filePath)
-// 		,	folder = filePath.substring(0, filePath.indexOf(fileName))
-// 	}
+
+	
 
 
 	// path strings to tree structure utility: pathsToTree. input is an array of string file paths. 
