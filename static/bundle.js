@@ -1369,20 +1369,30 @@ module.exports = Backbone.Router.extend({
 
 });
 },{"../lib/Backbone":25,"../lib/jQuery":26,"../view/OpenFileView":34,"../view/editor/WorkspaceView":37}],24:[function(require,module,exports){
-var Workspace = function(){}
+
 var _ = require('../lib/underscore')
+var Backbone = require('../lib/Backbone')
+
+var Workspace = function()
+{
+
+}
 
 // @class Workspace is a controller that handles the cooperation beween the uwer, the tree view and the editor so the application doesn't know anything about it,
 _.extend(Workspace.prototype, {
 	setSelectedFile: function(model)
 	{
-		console.log('www', model)
+		this.selectedFile = model;
+		this.trigger('change:selectedFile', model)
+		// console.log('www', model)
 	}
 })
+_.extend(Workspace.prototype, Backbone.Events)
+
 // Workspace.instance = new Workspace()
 
 module.exports = Workspace;
-},{"../lib/underscore":27}],25:[function(require,module,exports){
+},{"../lib/Backbone":25,"../lib/underscore":27}],25:[function(require,module,exports){
 module.exports = Backbone
 },{}],26:[function(require,module,exports){
 module.exports = jQuery
@@ -1392,7 +1402,11 @@ module.exports = _
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "file editor !";
+    var helper;
+
+  return "file editor !\n<pre>"
+    + container.escapeExpression(((helper = (helper = helpers.str || (depth0 != null ? depth0.str : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"str","hash":{},"data":data}) : helper)))
+    + "</pre>";
 },"useData":true});
 
 },{"hbsfy/runtime":20}],29:[function(require,module,exports){
@@ -1606,14 +1620,46 @@ var $ = require('../../lib/jQuery')
 module.exports = AbstractView.extend({
 
 	template: require('../../template/editor/fileeditor.hbs')
-
+// ,	workspaceInstall: function(workspace)
+// 	{
+// 		this.workspace = workspace;
+// 		this.workspace.on('change:selectedFile', _.bind(this.changeSelectedFile, this)) //TODO: off on destroy
+// 		var model = this.workspace.selectedFile;
+// 		debugger;
+// 	}
+,	changeSelectedFile: function(model)
+	{
+		console.log('changeSelectedFile',model)
+	}
 ,	afterRender: function()
 	{
+		this.application.workspace.on('change:selectedFile', _.bind(this.render, this)) //TODO: off on destroy
+		this.model = this.application.workspace.selectedFile || null;
 	}
 
 ,	getContext: function()
 	{
-		// return this.application.workspace	
+		this.model = this.application.workspace.selectedFile || null;
+		if(!this.model)
+		{
+			return {}
+		}
+		var buf = [];
+		_.each(this.model.data.chunks, function(chunk)
+		{
+			buf.push(chunk.content)
+			_.each(chunk.changes, function(change)
+			{
+				buf.push(change.content)
+			})
+		})
+		
+		var str = buf.join('\n')
+		console.log('contettt',str)
+		return {
+			model:this.model
+		,	str: str
+		};
 	}
 
 })
@@ -1670,12 +1716,14 @@ module.exports = AbstractView.extend({
 		{
 			var view = new FileTreeView()
 			// view.application = parentView.application
+			// view.workspaceInstall(parentView.workspace)
 			return view;
 		}
 
 	,	'file-editor': function(parentView)
 		{
 			var view = new FileEditorView()
+			// view.workspaceInstall(parentView.workspace)
 			// view.application = parentView.application
 			return view;
 		}

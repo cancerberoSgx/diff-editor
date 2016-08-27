@@ -12,12 +12,14 @@ module.exports = AbstractView.extend({
 		{
 			var view = new FileTreeView()
 			// view.application = parentView.application
+			// view.workspaceInstall(parentView.workspace)
 			return view;
 		}
 
 	,	'file-editor': function(parentView)
 		{
 			var view = new FileEditorView()
+			// view.workspaceInstall(parentView.workspace)
 			// view.application = parentView.application
 			return view;
 		}
