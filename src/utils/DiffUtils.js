@@ -11,7 +11,10 @@ module.exports = {
 		{
 			n.data = _.find(files, function(f){return f.from===n.id})
 			// n.children = n.children && n.children.length ? n.children : undefined
-			n.text = n.name; //for jstree
+
+			//for jstree
+			n.text = n.name; 
+			n.state.opened = true
 		})
 		return tree;
 	}
