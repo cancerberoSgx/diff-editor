@@ -1,3 +1,6 @@
+[Online Diff Editor](https://cancerberosgx.github.io/diff-editor/static/index.html)
+
+
 #how to build and run
 
 For the following instructions we need browserify and http-server installed globally:

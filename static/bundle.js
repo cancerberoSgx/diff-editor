@@ -1343,8 +1343,9 @@ var workspaceFirstTime = true;
 module.exports = Backbone.Router.extend({
 
 	routes: {
-		"openFile": "openFile",
-		"workspace": "workspace"
+		'': 'openFile',
+		'openFile': 'openFile',
+		'workspace': 'workspace'
 	}
 
 ,	openFile: function() 
@@ -1461,7 +1462,7 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "Open file : \n<br/>\n<input data-action=\"file\" type=\"file\"></input>";
+    return "<h3>Diff Editor</h3>\n<p>Welcome to diff-editor, please open one diff/patch file: </p>\n<br/>\n<input data-action=\"file\" type=\"file\"></input>";
 },"useData":true});
 
 },{"hbsfy/runtime":20}],32:[function(require,module,exports){
@@ -1651,22 +1652,11 @@ module.exports = AbstractView.extend({
 },{"../lib/underscore":27,"../template/openFile.hbs":31,"../view/AbstractView":33}],35:[function(require,module,exports){
 var AbstractView = require('../../view/AbstractView')
 var _ = require('../../lib/underscore')
-var $ = require('../../lib/jQuery')
 
 module.exports = AbstractView.extend({
 
 	template: require('../../template/editor/fileeditor.hbs')
-// ,	workspaceInstall: function(workspace)
-// 	{
-// 		this.workspace = workspace;
-// 		this.workspace.on('change:selectedFile', _.bind(this.changeSelectedFile, this)) //TODO: off on destroy
-// 		var model = this.workspace.selectedFile;
-// 		debugger;
-// 	}
-,	changeSelectedFile: function(model)
-	{
-		console.log('changeSelectedFile',model)
-	}
+
 ,	afterRender: function()
 	{
 		this.application.workspace.on('change:selectedFile', _.bind(this.render, this)) //TODO: off on destroy
@@ -1680,6 +1670,8 @@ module.exports = AbstractView.extend({
 		{
 			return {}
 		}
+
+		//TODO: move this string extraction to DiffUtils
 		var buf = [];
 		_.each(this.model.data.chunks, function(chunk)
 		{
@@ -1691,7 +1683,7 @@ module.exports = AbstractView.extend({
 		})
 		
 		var str = buf.join('\n')
-		console.log('contettt',this.model)
+		// console.log('contettt',this.model)
 		return {
 			model:this.model
 		,	str: str
@@ -1699,10 +1691,9 @@ module.exports = AbstractView.extend({
 	}
 
 })
-},{"../../lib/jQuery":26,"../../lib/underscore":27,"../../template/editor/fileeditor.hbs":28,"../../view/AbstractView":33}],36:[function(require,module,exports){
+},{"../../lib/underscore":27,"../../template/editor/fileeditor.hbs":28,"../../view/AbstractView":33}],36:[function(require,module,exports){
 var AbstractView = require('../../view/AbstractView')
 var _ = require('../../lib/underscore')
-// var $ = require('../../lib/jQuery')
 
 module.exports = AbstractView.extend({
 
@@ -1712,6 +1703,12 @@ module.exports = AbstractView.extend({
 	{
 		// var model = data.node;
 		this.application.workspace.setSelectedFile(data.node)
+	}
+
+,	selectedFile: function(data)
+	{
+		console.log('tree view selectedFile', data)
+		
 	}
 
 ,	afterRender: function()
@@ -1733,7 +1730,10 @@ module.exports = AbstractView.extend({
 		});
 
 		//backbone events won't work for this binding:
-		this.$('[data-type="tree"]').on("changed.jstree", _.bind(this.treeSelectionHandler, this))
+		this.$('[data-type="tree"]').on("changed.jstree", _.bind(this.treeSelectionHandler, this));
+
+
+		this.application.workspace.on('change:selectedFile', _.bind(this.selectedFile, this)) //TODO: off on destroy
 	}
 
 })

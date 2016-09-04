@@ -1,6 +1,5 @@
 var AbstractView = require('../../view/AbstractView')
 var _ = require('../../lib/underscore')
-// var $ = require('../../lib/jQuery')
 
 module.exports = AbstractView.extend({
 
@@ -10,6 +9,12 @@ module.exports = AbstractView.extend({
 	{
 		// var model = data.node;
 		this.application.workspace.setSelectedFile(data.node)
+	}
+
+,	selectedFile: function(data)
+	{
+		console.log('tree view selectedFile', data)
+		
 	}
 
 ,	afterRender: function()
@@ -31,7 +36,10 @@ module.exports = AbstractView.extend({
 		});
 
 		//backbone events won't work for this binding:
-		this.$('[data-type="tree"]').on("changed.jstree", _.bind(this.treeSelectionHandler, this))
+		this.$('[data-type="tree"]').on("changed.jstree", _.bind(this.treeSelectionHandler, this));
+
+
+		this.application.workspace.on('change:selectedFile', _.bind(this.selectedFile, this)) //TODO: off on destroy
 	}
 
 })

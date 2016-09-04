@@ -1,21 +1,10 @@
 var AbstractView = require('../../view/AbstractView')
 var _ = require('../../lib/underscore')
-var $ = require('../../lib/jQuery')
 
 module.exports = AbstractView.extend({
 
 	template: require('../../template/editor/fileeditor.hbs')
-// ,	workspaceInstall: function(workspace)
-// 	{
-// 		this.workspace = workspace;
-// 		this.workspace.on('change:selectedFile', _.bind(this.changeSelectedFile, this)) //TODO: off on destroy
-// 		var model = this.workspace.selectedFile;
-// 		debugger;
-// 	}
-,	changeSelectedFile: function(model)
-	{
-		console.log('changeSelectedFile',model)
-	}
+
 ,	afterRender: function()
 	{
 		this.application.workspace.on('change:selectedFile', _.bind(this.render, this)) //TODO: off on destroy
@@ -29,6 +18,8 @@ module.exports = AbstractView.extend({
 		{
 			return {}
 		}
+
+		//TODO: move this string extraction to DiffUtils
 		var buf = [];
 		_.each(this.model.data.chunks, function(chunk)
 		{
@@ -40,7 +31,7 @@ module.exports = AbstractView.extend({
 		})
 		
 		var str = buf.join('\n')
-		console.log('contettt',this.model)
+		// console.log('contettt',this.model)
 		return {
 			model:this.model
 		,	str: str

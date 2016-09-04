@@ -6,8 +6,9 @@ var workspaceFirstTime = true;
 module.exports = Backbone.Router.extend({
 
 	routes: {
-		"openFile": "openFile",
-		"workspace": "workspace"
+		'': 'openFile',
+		'openFile': 'openFile',
+		'workspace': 'workspace'
 	}
 
 ,	openFile: function() 
