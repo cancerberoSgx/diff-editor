@@ -1418,11 +1418,11 @@ var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=container.lambda, alias2=container.escapeExpression;
 
-  return "<ul>\n	<li><b>from</b>: "
+  return "<ul>\n<!-- 	<li><b>from</b>: "
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1)) != null ? stack1.from : stack1), depth0))
     + "</li>\n	<li><b>to</b>: "
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1)) != null ? stack1.to : stack1), depth0))
-    + "</li>\n	<li><b>additions</b>: "
+    + "</li> -->\n	<li><b>additions</b>: "
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1)) != null ? stack1.additions : stack1), depth0))
     + "</li>\n	<li><b>deletions</b>: "
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1)) != null ? stack1.deletions : stack1), depth0))
@@ -1435,8 +1435,7 @@ module.exports = HandlebarsCompiler.template({"1":function(container,depth0,help
     return "Please select a file in the tree\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, buffer = 
-  "file editor !\n"
-    + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+  ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.model : depth0)) != null ? stack1.data : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
   stack1 = ((helper = (helper = helpers["else"] || (depth0 != null ? depth0["else"] : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"else","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data}),(typeof helper === "function" ? helper.call(alias1,options) : helper));
   if (!helpers["else"]) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
   if (stack1 != null) { buffer += stack1; }
@@ -1448,14 +1447,14 @@ module.exports = HandlebarsCompiler.template({"1":function(container,depth0,help
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "file tree!\n\n<div data-type=\"tree\">heloooooo</div>\n\n<p>file tree end</p>";
+    return "\nSearch: <input type=\"text\" data-type=\"tree-search-input\" value=\"\" class=\"input\">\n\n<div data-type=\"tree\"></div>\n\n<!--\n<button class='edit-node-popover' title=\"Edit file\" href='#'></button>\n<div id=\"edit-node-popover-content\" style=\"display: none\">\n  <div>This is your div content</div>\n</div>\n-->";
 },"useData":true});
 
 },{"hbsfy/runtime":20}],30:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "workspace! <a href=\"#openFile\">open file</a>\n\n<div class=\"container-fluid\">\n\n<div class=\"row\">\n  <div class=\"col-md-4\">\n	<div data-view=\"file-tree\"></div>\n  </div>\n  <div class=\"col-md-8\">\n	<div data-view=\"file-editor\"></div>\n  </div>\n</div>\n\n</div>\n\n\n\nend workspace";
+    return "<a href=\"#openFile\">Open Another file</a><br/><br/>\n\n<div class=\"container-fluid\">\n	<div class=\"row\">\n	  <div class=\"col-md-4\">\n		<div data-view=\"file-tree\"></div>\n	  </div>\n	  <div class=\"col-md-8\">\n		<div data-view=\"file-editor\"></div>\n	  </div>\n	</div>\n</div>\n";
 },"useData":true});
 
 },{"hbsfy/runtime":20}],31:[function(require,module,exports){
@@ -1472,22 +1471,34 @@ var parse = require('parse-diff');
 module.exports = {
 	parseDiff: function(diffContent)
 	{
-		var files = parse(diffContent);
+		var self = this
+		,	files = parse(diffContent);
 		var filePaths = _.map(files, function(file){return file.from})
 		var tree = this.pathsToTree(filePaths)
 		this.visitTreeNodes(tree, function(n)
 		{
 			n.data = _.find(files, function(f){return f.from===n.id})
-			// n.children = n.children && n.children.length ? n.children : undefined
-
-			//for jstree
-			n.text = n.name; 
-			n.state = {opened: true}
-			// n.icon = 'file'
+			self.addJsTreeParticularities(n, tree)
 		})
 		return tree;
 	}
 
+	// this will add to the tree nodes the data needed for jstree, like text, state, icon
+,	addJsTreeParticularities: function(node, tree)
+	{
+		//for jstree
+		node.text = node.name; 
+		node.state = {opened: true}
+		console.log(node.name, node.data)
+		if(!node.data)
+		{
+			node.icon = 'glyphicon glyphicon-folder-open'
+		}
+		else
+		{
+			node.icon = 'glyphicon glyphicon-file'
+		}
+	}
 
 
 ,	visitTreeNodes: function(node, fn)
@@ -1673,7 +1684,7 @@ module.exports = AbstractView.extend({
 
 		//TODO: move this string extraction to DiffUtils
 		var buf = [];
-		_.each(this.model.data.chunks, function(chunk)
+		_.each(this.model.data ? this.model.data.chunks : [], function(chunk)
 		{
 			buf.push(chunk.content)
 			_.each(chunk.changes, function(change)
@@ -1694,22 +1705,11 @@ module.exports = AbstractView.extend({
 },{"../../lib/underscore":27,"../../template/editor/fileeditor.hbs":28,"../../view/AbstractView":33}],36:[function(require,module,exports){
 var AbstractView = require('../../view/AbstractView')
 var _ = require('../../lib/underscore')
+// var FileTreeEditNodeView = require('./FileTreeEditNodeView')
 
 module.exports = AbstractView.extend({
 
 	template: require('../../template/editor/filetree.hbs')
-
-,	treeSelectionHandler: function(e, data)
-	{
-		// var model = data.node;
-		this.application.workspace.setSelectedFile(data.node)
-	}
-
-,	selectedFile: function(data)
-	{
-		console.log('tree view selectedFile', data)
-		
-	}
 
 ,	afterRender: function()
 	{
@@ -1721,20 +1721,67 @@ module.exports = AbstractView.extend({
 		}
 
 		var data = [this.diff];
-		// console.log('afterRender', data)
 
 		this.$('[data-type="tree"]').jstree({
 			'core' : {
 				'data' : data
+			,	"check_callback" : true
 			}
+    	,	'themes' : { 'stripes' : true }
+		,	'plugins' : [ 'contextmenu', 'dnd', 'search', 'wholerow']
+		});
+
+		var to = false;
+		this.$('[data-type="tree-search-input"]').keyup(function () 
+		{
+			if(to) { clearTimeout(to); }
+			to = setTimeout(function () 
+			{
+			  var v = this.$('[data-type="tree-search-input"]').val();
+			  console.log('search', v)
+			  this.$('[data-type="tree"]').jstree(true).search(v);
+			}, 250);
 		});
 
 		//backbone events won't work for this binding:
 		this.$('[data-type="tree"]').on("changed.jstree", _.bind(this.treeSelectionHandler, this));
 
-
-		this.application.workspace.on('change:selectedFile', _.bind(this.selectedFile, this)) //TODO: off on destroy
+		// this.application.workspace.on('change:selectedFile', _.bind(this.selectedFile, this)) //TODO: off on destroy
 	}
+
+
+,	treeSelectionHandler: function(e, data)
+	{
+		this.application.workspace.setSelectedFile(data.node)
+	}
+
+// ,	selectedFile: function(data)
+// 	{
+		// if(!data.data)
+		// {
+		// 	$('.edit-node-popover').popover('hide')
+		// 	return 
+		// }
+		// var popoverContent = $('#edit-node-popover-content');
+		// $('.edit-node-popover').popover({ 
+		// 	html : true
+		// ,	content: function() 
+		// 	{
+		// 		return popoverContent.html();
+		// 	}
+		// });
+
+		// var nodeEl = $(document.getElementById(data.id));
+
+		// console.log(data)
+		// $('.edit-node-popover').popover('show')
+		// $('.popover').css({
+		// 	left: (nodeEl.offset().left+popoverContent.width())+'px'
+		// ,	top: (nodeEl.offset().top-popoverContent.height()*1.5)+'px'
+		// })
+	
+	// }
+
 
 })
 },{"../../lib/underscore":27,"../../template/editor/filetree.hbs":29,"../../view/AbstractView":33}],37:[function(require,module,exports){

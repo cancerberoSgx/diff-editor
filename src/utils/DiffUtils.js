@@ -4,22 +4,34 @@ var parse = require('parse-diff');
 module.exports = {
 	parseDiff: function(diffContent)
 	{
-		var files = parse(diffContent);
+		var self = this
+		,	files = parse(diffContent);
 		var filePaths = _.map(files, function(file){return file.from})
 		var tree = this.pathsToTree(filePaths)
 		this.visitTreeNodes(tree, function(n)
 		{
 			n.data = _.find(files, function(f){return f.from===n.id})
-			// n.children = n.children && n.children.length ? n.children : undefined
-
-			//for jstree
-			n.text = n.name; 
-			n.state = {opened: true}
-			// n.icon = 'file'
+			self.addJsTreeParticularities(n, tree)
 		})
 		return tree;
 	}
 
+	// this will add to the tree nodes the data needed for jstree, like text, state, icon
+,	addJsTreeParticularities: function(node, tree)
+	{
+		//for jstree
+		node.text = node.name; 
+		node.state = {opened: true}
+		console.log(node.name, node.data)
+		if(!node.data)
+		{
+			node.icon = 'glyphicon glyphicon-folder-open'
+		}
+		else
+		{
+			node.icon = 'glyphicon glyphicon-file'
+		}
+	}
 
 
 ,	visitTreeNodes: function(node, fn)

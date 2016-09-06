@@ -21,7 +21,7 @@ module.exports = AbstractView.extend({
 
 		//TODO: move this string extraction to DiffUtils
 		var buf = [];
-		_.each(this.model.data.chunks, function(chunk)
+		_.each(this.model.data ? this.model.data.chunks : [], function(chunk)
 		{
 			buf.push(chunk.content)
 			_.each(chunk.changes, function(change)
