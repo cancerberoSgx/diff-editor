@@ -3,6 +3,9 @@ var OpenFileView = require('../view/OpenFileView')
 var WorkspaceView = require('../view/editor/WorkspaceView')
 
 var workspaceFirstTime = true;
+
+// @module diff-editor
+// @class EditorRouter @extends Backbone.Router
 module.exports = Backbone.Router.extend({
 
 	routes: {
@@ -11,12 +14,14 @@ module.exports = Backbone.Router.extend({
 		'workspace': 'workspace'
 	}
 
+	// @method openFile
 ,	openFile: function() 
 	{
 		var view = new OpenFileView()
 		this.application.showView(view)
 	}
 
+	// @method workspace
 ,	workspace: function() 
 	{
 		var self = this;

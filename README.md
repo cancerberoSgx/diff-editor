@@ -19,6 +19,12 @@ For development:
 
 	watchify -t hbsfy src -o static/bundle.js;
 
+For generate the jsdocs:
+	
+	rm -rf apidoc; node build-jsdoc
+
+
+
 
 
 

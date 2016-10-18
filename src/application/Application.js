@@ -4,10 +4,13 @@ var Router = require('../application/EditorRouter')
 var Workspace = require('./Workspace')
 var diffUtils = require('../utils/DiffUtils')
 
+// @module diff-editor
+// @class Application
 var Application = function(){}
 
 _.extend(Application.prototype, {
 
+	// @method start
 	start: function()
 	{
 		this.workspace = new Workspace()
@@ -18,6 +21,7 @@ _.extend(Application.prototype, {
 		Backbone.history.start();
 	}
 
+	// @method showView @param {Backbone.View} view
 ,	showView: function(view)
 	{
 		view.application=this
@@ -27,11 +31,14 @@ _.extend(Application.prototype, {
 		view.render()
 		view.$el.appendTo(document.body)
 	}
+
+	// @method setDiffContent @param {String} content
 ,	setDiffContent: function(content)
 	{
 		this.diff = diffUtils.parseDiff(content)
-		// console.log('setDiffContent', content, this.diff)
 	}
+
+	// @method getDiff @returns {Object}
 ,	getDiff: function()
 	{
 		return this.diff

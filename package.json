@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "handlebars": "^4.0.5",
-    "hbsfy": "^2.7.0"
+    "hbsfy": "^2.7.0",
+    "short-jsdoc": "^0.2.6"
   }
 }
